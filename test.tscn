@@ -1,0 +1,106 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://ColorRect.gd" type="Script" id=1]
+[ext_resource path="res://gradient_mouse.shader" type="Shader" id=2]
+[ext_resource path="res://plot_sqrt.shader" type="Shader" id=3]
+
+[sub_resource type="ShaderMaterial" id=1]
+shader = ExtResource( 2 )
+shader_param/texture_size = null
+shader_param/mouse_pos = null
+
+[sub_resource type="ShaderMaterial" id=3]
+shader = ExtResource( 3 )
+shader_param/texture_size = null
+shader_param/mouse_pos = null
+
+[sub_resource type="Shader" id=4]
+code = "shader_type canvas_item;
+
+uniform vec3 col1 = vec3(0.4, 0.234, 0.8);
+uniform vec3 col2 = vec3(0.1, 0.78, 0.34);
+
+const float HALF_PI = 1.5707963267948966;
+
+float circularIn(float t) {
+  return 1.0 - sqrt(1.0 - t * t);
+}
+
+float easeOutBounce(float x) {
+	const float n1 = 7.5625;
+	const float d1 = 2.75;
+
+	if (x < 1. / d1) {
+	    return n1 * x * x;
+	} else if (x < 2. / d1) {
+	    return n1 * (x -= 1.5 / d1) * x + 0.75;
+	} else if (x < 2.5 / d1) {
+	    return n1 * (x -= 2.25 / d1) * x + 0.9375;
+	} else {
+	    return n1 * (x -= 2.625 / d1) * x + 0.984375;
+	}
+}
+
+float easeInOutBounce(float x) {
+return x < 0.5
+  ? (1. - easeOutBounce(1. - 2. * x)) / 2.
+  : (1. + easeOutBounce(2. * x - 1.)) / 2.;
+}
+
+float elasticInOut(float t) {
+  return t < 0.5
+    ? 0.5 * sin(+13.0 * HALF_PI * 2.0 * t) * pow(2.0, 10.0 * (2.0 * t - 1.0))
+    : 0.5 * sin(-13.0 * HALF_PI * ((2.0 * t - 1.0) + 1.0)) * pow(2.0, -10.0 * (2.0 * t - 1.0)) + 1.0;
+}
+
+void fragment() {
+	vec3 col = vec3(0.0);
+	
+	float pct = pow(abs(sin(TIME)), 5.);
+//	pct = abs(sin(TIME*3.));
+	pct = elasticInOut(abs(sin(TIME*0.5)));
+	
+	col = mix(col1, col2, pct);
+	
+	COLOR = vec4(col, 1.0);
+}"
+custom_defines = ""
+
+[sub_resource type="ShaderMaterial" id=5]
+shader = SubResource( 4 )
+shader_param/col1 = Vector3( 0.4, 0.234, 0.8 )
+shader_param/col2 = Vector3( 0.1, 0.78, 0.34 )
+
+[node name="Node2D" type="Node2D"]
+
+[node name="ColorRect" type="ColorRect" parent="."]
+visible = false
+material = SubResource( 1 )
+margin_left = -4.0
+margin_top = 16.0
+margin_right = 2429.0
+margin_bottom = 1312.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="."]
+visible = false
+material = SubResource( 3 )
+margin_left = 31.5876
+margin_top = 27.0986
+margin_right = 2899.59
+margin_bottom = 1627.1
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect3" type="ColorRect" parent="."]
+material = SubResource( 5 )
+margin_right = 759.0
+margin_bottom = 426.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
